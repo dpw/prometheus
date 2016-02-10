@@ -287,6 +287,27 @@ var expectedConf = &Config{
 				},
 			},
 		},
+		{
+			JobName: "service-etcd",
+
+			ScrapeInterval: Duration(15 * time.Second),
+			ScrapeTimeout:  DefaultGlobalConfig.ScrapeTimeout,
+
+			MetricsPath: DefaultScrapeConfig.MetricsPath,
+			Scheme:      DefaultScrapeConfig.Scheme,
+
+			EtcdSDConfigs: []*EtcdSDConfig{
+				{
+					Endpoints: []string{
+						"http://etc2:2379/",
+						"http://etcd2:2379/",
+					},
+					Username:     "myusername",
+					Password:     "mypassword",
+					DirectoryKey: "/prom-targets",
+				},
+			},
+		},
 	},
 	original: "",
 }

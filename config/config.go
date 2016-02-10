@@ -380,6 +380,8 @@ type ScrapeConfig struct {
 	KubernetesSDConfigs []*KubernetesSDConfig `yaml:"kubernetes_sd_configs,omitempty"`
 	// List of EC2 service discovery configurations.
 	EC2SDConfigs []*EC2SDConfig `yaml:"ec2_sd_configs,omitempty"`
+	// List of etcd service discovery configurations.
+	EtcdSDConfigs []*EtcdSDConfig `yaml:"etcd_sd_configs,omitempty"`
 
 	// List of target relabel configurations.
 	RelabelConfigs []*RelabelConfig `yaml:"relabel_configs,omitempty"`
@@ -770,6 +772,34 @@ func (c *EC2SDConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		return fmt.Errorf("EC2 SD configuration requires a region")
 	}
 	return checkOverflow(c.XXX, "ec2_sd_config")
+}
+
+// EtcdSDConfig is the configuration for Consul service discovery.
+type EtcdSDConfig struct {
+	Endpoints    []string `yaml:"endpoints"`
+	Username     string   `yaml:"username,omitempty"`
+	Password     string   `yaml:"password,omitempty"`
+	DirectoryKey string   `yaml:"directory_key"`
+
+	// Catches all undefined fields and must be empty after parsing.
+	XXX map[string]interface{} `yaml:",inline"`
+}
+
+// UnmarshalYAML implements the yaml.Unmarshaler interface.
+func (c *EtcdSDConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	*c = EtcdSDConfig{}
+	type plain EtcdSDConfig
+	err := unmarshal((*plain)(c))
+	if err != nil {
+		return err
+	}
+	if len(c.Endpoints) == 0 {
+		return fmt.Errorf("Etcd SD configuration requires a non-empty endpoints list")
+	}
+	if c.DirectoryKey == "" {
+		return fmt.Errorf("Etcd SD configuration requires a directory key")
+	}
+	return checkOverflow(c.XXX, "etcd_sd_config")
 }
 
 // RelabelAction is the action to be performed on relabeling.

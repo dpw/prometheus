@@ -133,3 +133,10 @@ scrape_configs:
       - localhost
       paths:
       - /monitoring
+
+- job_name: service-etcd
+  etcd_sd_configs:
+    - endpoints: ['http://etc2:2379/', 'http://etcd2:2379/']
+      username: 'myusername'
+      password: 'mypassword'
+      directory_key: '/prom-targets'
